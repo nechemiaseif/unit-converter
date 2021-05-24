@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
 
 import nseif.unitconverter.R;
 import nseif.unitconverter.models.UnitConverter;
@@ -24,8 +24,8 @@ import static nseif.unitconverter.lib.Utils.showInfoDialog;
 
 public class MainActivity extends AppCompatActivity {
     private UnitConverter mConverter;
-    private EditText mEtInput;
-    private TextView mTvOutput;
+    private TextInputLayout mEtInput;
+    private TextInputLayout mTvOutput;
 
     private final String mKEY_INPUT_TYPE = "INPUT_TYPE";
 
@@ -105,17 +105,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        mEtInput.setText(String.valueOf(mConverter.getInput()));
-        mTvOutput.setText(String.valueOf(mConverter.getOutput()));
+        EditText inputEditText = mEtInput.getEditText();
+        EditText outputEditText = mTvOutput.getEditText();
+        if (inputEditText != null && outputEditText != null) {
+            inputEditText.setText(String.valueOf(mConverter.getInput()));
+            outputEditText.setText(String.valueOf(mConverter.getOutput()));
+        }
     }
 
     private void convert() {
-        // TODO use input type from preferences
-        String inputStr = mEtInput.getText().toString();
+        EditText editText = mEtInput.getEditText();
 
-        if(!inputStr.isEmpty()) {
-            mConverter.convert(UnitConverter.InputType.MILES, Double.parseDouble(mEtInput.getText().toString()));
-            updateUI();
+        if (editText != null) {
+            // TODO use input type from preferences
+            String inputStr = editText.getText().toString();
+
+            if (!inputStr.isEmpty()) {
+                mConverter.convert(UnitConverter.InputType.MILES, Double.parseDouble(inputStr));
+                updateUI();
+            }
         }
     }
 
