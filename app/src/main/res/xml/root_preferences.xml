@@ -1,0 +1,14 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="Preferences">
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="input_type"
+            app:summaryOff="Convert from miles to kilometers"
+            app:summaryOn="Convert from kilometers to miles"
+            app:title="Input Type"
+            />
+    </PreferenceCategory>
+
+</PreferenceScreen>
