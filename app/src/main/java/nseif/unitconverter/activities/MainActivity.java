@@ -24,10 +24,13 @@ import static nseif.unitconverter.lib.Utils.showInfoDialog;
 
 public class MainActivity extends AppCompatActivity {
     private UnitConverter mConverter;
-    private TextInputLayout mEtInput;
-    private TextInputLayout mTvOutput;
+    private TextInputLayout mInput;
+    private TextInputLayout mOutput;
 
     private final String mKEY_INPUT_TYPE = "INPUT_TYPE";
+
+    private final String mKEY_INPUT = "INPUT";
+    private final String mKEY_OUTPUT = "OUTPUT";
 
     @Override
     protected void onStop() {
@@ -60,7 +63,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(mKEY_INPUT_TYPE, mConverter.getInputType().ordinal());
+
+        EditText inputEditText = mInput.getEditText();
+        EditText outputEditText = mOutput.getEditText();
+
+        if (inputEditText != null) {
+            outState.putDouble(mKEY_INPUT, Double.parseDouble(inputEditText.getText().toString()));
+        }
+
+        if (outputEditText != null) {
+            outState.putDouble(mKEY_OUTPUT, Double.parseDouble(outputEditText.getText().toString()));
+        }
     }
 
     @Override
@@ -77,16 +90,31 @@ public class MainActivity extends AppCompatActivity {
         setupToolbar();
         setupViews();
         setupFAB();
-        setupConverter();
+        setupConverter(savedInstanceState);
     }
 
-    private void setupConverter() {
+    private void setupConverter(Bundle savedInstanceState) {
         mConverter = new UnitConverter();
+
+        if (savedInstanceState != null) {
+            double savedInput = savedInstanceState.getDouble(mKEY_INPUT);
+            double savedOutput = savedInstanceState.getDouble(mKEY_OUTPUT);
+
+            if (savedInput != 0.0) {
+                mConverter.setInput(savedInput);
+            }
+
+            if (savedOutput != 0.0) {
+                mConverter.setOutput(savedOutput);
+            }
+        }
+
+        updateUI();
     }
 
     private void setupViews() {
-        mEtInput = findViewById(R.id.input);
-        mTvOutput = findViewById(R.id.output);
+        mInput = findViewById(R.id.input);
+        mOutput = findViewById(R.id.output);
     }
 
     private void setupToolbar() {
@@ -105,16 +133,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        EditText inputEditText = mEtInput.getEditText();
-        EditText outputEditText = mTvOutput.getEditText();
-        if (inputEditText != null && outputEditText != null) {
+        EditText inputEditText = mInput.getEditText();
+        EditText outputEditText = mOutput.getEditText();
+
+        if (inputEditText != null) {
             inputEditText.setText(String.valueOf(mConverter.getInput()));
+        }
+
+        if (outputEditText != null) {
             outputEditText.setText(String.valueOf(mConverter.getOutput()));
         }
     }
 
     private void convert() {
-        EditText editText = mEtInput.getEditText();
+        EditText editText = mInput.getEditText();
 
         if (editText != null) {
             // TODO use input type from preferences
