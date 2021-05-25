@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import nseif.unitconverter.R;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private UnitConverter mConverter;
     private TextInputLayout mInput;
     private TextInputLayout mOutput;
+    private Snackbar mSnackBar;
 
     private final String mKEY_IS_INPUT_TYPE_KM = "IS_INPUT_TYPE_KM";
 
@@ -121,9 +123,16 @@ public class MainActivity extends AppCompatActivity {
         updateUI();
     }
 
+    private void dismissSnackBarIfShown() {
+        if (mSnackBar.isShown()) {
+            mSnackBar.dismiss();
+        }
+    }
+
     private void setupViews() {
         mInput = findViewById(R.id.input);
         mOutput = findViewById(R.id.output);
+        mSnackBar = Snackbar.make(findViewById(android.R.id.content), "Welcome!", Snackbar.LENGTH_LONG);
     }
 
     private void setupToolbar() {
@@ -142,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
+        dismissSnackBarIfShown();
+
         EditText inputEditText = mInput.getEditText();
         EditText outputEditText = mOutput.getEditText();
 
@@ -153,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             outputEditText.setText(String.valueOf(mConverter.getOutput()));
         }
 
-        switch(mConverter.getInputType()){
+        switch (mConverter.getInputType()) {
             case MILES:
                 mInput.setHint("Miles");
                 mOutput.setHint("Kilometers");
@@ -171,8 +182,19 @@ public class MainActivity extends AppCompatActivity {
         if (editText != null) {
             String inputStr = editText.getText().toString();
 
-            if (!inputStr.isEmpty()) {
-                mConverter.convert(Double.parseDouble(inputStr));
+            if (inputStr.isEmpty()) {
+                mSnackBar.setText("Please enter a value");
+                mSnackBar.show();
+                return;
+            }
+
+            double inputVal = Double.parseDouble(inputStr);
+
+            if (inputVal <= 0) {
+                mSnackBar.setText("Please enter a value greater than 0");
+                mSnackBar.show();
+            } else {
+                mConverter.convert(inputVal);
                 updateUI();
             }
         }
@@ -200,11 +222,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showAbout() {
+        dismissSnackBarIfShown();
         showInfoDialog(MainActivity.this, "About Unit Converter",
                 "Convert between miles and kilometers!\nby Nechemia Seif");
     }
 
     private void showSettings() {
+        dismissSnackBarIfShown();
         Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
         startActivityForResult(intent, 1);
     }
