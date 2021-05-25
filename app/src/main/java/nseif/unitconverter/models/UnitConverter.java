@@ -46,12 +46,12 @@ public class UnitConverter {
         return inputType;
     }
 
-    public void setInputTypeFromOrdinal(int inputTypeOrdinal)
+    public void setInputType(InputType inputType)
     {
-        this.inputType = InputType.values()[inputTypeOrdinal];
+        this.inputType = inputType;
     }
 
-    public void convert(InputType inputType, double input)
+    public void convert(double input)
     {
         setInput(input);
 

@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private TextInputLayout mInput;
     private TextInputLayout mOutput;
 
-    private final String mKEY_INPUT_TYPE = "INPUT_TYPE";
+    private final String mKEY_IS_INPUT_TYPE_KM = "IS_INPUT_TYPE_KM";
 
     private final String mKEY_INPUT = "INPUT";
     private final String mKEY_OUTPUT = "OUTPUT";
@@ -42,9 +42,11 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences defaultSharedPreferences = getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = defaultSharedPreferences.edit();
 
-        editor.putInt(mKEY_INPUT_TYPE, mConverter.getInputType().ordinal());
+        editor.putBoolean(mKEY_IS_INPUT_TYPE_KM, mConverter.getInputType().equals(UnitConverter.InputType.KM));
 
         editor.apply();
+
+        updateUI();
     }
 
     @Override
@@ -56,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void restoreOrSetFromPreferences() {
         SharedPreferences sp = getDefaultSharedPreferences(this);
-        int inputTypeOrdinal = sp.getInt(mKEY_INPUT_TYPE, 0);
-        mConverter.setInputTypeFromOrdinal(inputTypeOrdinal);
+        boolean isInputTypeKm = sp.getBoolean(mKEY_IS_INPUT_TYPE_KM, false);
+        mConverter.setInputType(isInputTypeKm ? UnitConverter.InputType.KM : UnitConverter.InputType.MILES);
+        updateUI();
     }
 
     @Override
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mConverter.setInputTypeFromOrdinal(savedInstanceState.getInt(mKEY_INPUT_TYPE, 0));
+        mConverter.setInputType(savedInstanceState.getBoolean(mKEY_IS_INPUT_TYPE_KM, false) ? UnitConverter.InputType.KM : UnitConverter.InputType.MILES);
         updateUI();
     }
 
@@ -108,6 +111,12 @@ public class MainActivity extends AppCompatActivity {
                 mConverter.setOutput(savedOutput);
             }
         }
+
+
+        SharedPreferences sp = getDefaultSharedPreferences(this);
+        boolean isInputTypeKm = sp.getBoolean(mKEY_IS_INPUT_TYPE_KM, false);
+
+        mConverter.setInputType(isInputTypeKm ? UnitConverter.InputType.KM : UnitConverter.InputType.MILES);
 
         updateUI();
     }
@@ -143,17 +152,27 @@ public class MainActivity extends AppCompatActivity {
         if (outputEditText != null) {
             outputEditText.setText(String.valueOf(mConverter.getOutput()));
         }
+
+        switch(mConverter.getInputType()){
+            case MILES:
+                mInput.setHint("Miles");
+                mOutput.setHint("Kilometers");
+                break;
+            case KM:
+                mInput.setHint("Kilometers");
+                mOutput.setHint("Miles");
+                break;
+        }
     }
 
     private void convert() {
         EditText editText = mInput.getEditText();
 
         if (editText != null) {
-            // TODO use input type from preferences
             String inputStr = editText.getText().toString();
 
             if (!inputStr.isEmpty()) {
-                mConverter.convert(UnitConverter.InputType.MILES, Double.parseDouble(inputStr));
+                mConverter.convert(Double.parseDouble(inputStr));
                 updateUI();
             }
         }

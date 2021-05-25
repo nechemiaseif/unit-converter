@@ -4,7 +4,7 @@
     <PreferenceCategory app:title="Preferences">
         <SwitchPreferenceCompat
             app:defaultValue="false"
-            app:key="input_type"
+            app:key="IS_INPUT_TYPE_KM"
             app:summaryOff="Convert from miles to kilometers"
             app:summaryOn="Convert from kilometers to miles"
             app:title="Input Type"
